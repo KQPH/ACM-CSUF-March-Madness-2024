@@ -33,3 +33,36 @@ for i, router1 in enumerate(routers):
     if math.dist(router1[0:2], router2[0:2]) <= (router1[2] + router2[2]):
       pairs += 1
 print(pairs)
+
+# Part 2
+
+# Idea: We need to find areas of intersecting circles for each pair, and keep track of the max area
+# Process for calculating area of intersecting circles adapted from https://www.geeksforgeeks.org/area-of-intersection-of-two-circles/
+max_area: int = 0
+
+for i, router1 in enumerate(routers):
+  for router2 in routers[i + 1:]:
+    distance = math.dist(router1[0:2], router2[0:2])
+    radius1 = router1[2]
+    radius2 = router2[2]
+
+    # If distance is greater than then area of intersection is 0, because they don't intersect
+    if distance > radius1 + radius2:
+      continue
+    # If distance is less than difference of radii, then one circle envelops the other
+    if distance <= (radius1 - radius2) and radius1 >= radius2:
+        area = math.floor(math.pi * (radius2 ** 2))
+    elif distance <= (radius2 - radius1) and radius2 >= radius1:
+        area = math.floor(math.pi * (radius1 ** 2))
+    else:
+      alpha = math.acos(((radius1 ** 2) + (distance ** 2) - (radius2 ** 2)) / (2 * radius1 * distance)) * 2
+      beta  = math.acos(((radius2 ** 2) + (distance ** 2) - (radius1 ** 2)) / (2 * radius2 * distance)) * 2
+
+      a1 = (0.5 * beta * (radius2 ** 2)) - (0.5 * (radius2 ** 2) * math.sin(beta))
+      a2 = (0.5 * alpha * (radius1 ** 2)) - (0.5 * (radius1 ** 2) * math.sin(alpha))
+      area = math.floor(a1 + a2)
+
+    if area > max_area:
+      max_area = area
+
+print(max_area)
